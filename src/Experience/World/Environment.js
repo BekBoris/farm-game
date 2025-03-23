@@ -9,7 +9,7 @@ export default class Environment
         this.scene = this.experience.scene
         this.resources = this.experience.resources
         this.debug = this.experience.debug
-        
+
         // Debug
         if(this.debug.active)
         {
@@ -22,7 +22,7 @@ export default class Environment
 
     setSunLight()
     {
-        this.sunLight = new THREE.DirectionalLight('#ffffff', 4)
+        this.sunLight = new THREE.DirectionalLight('#ffffff', 2)
         this.sunLight.castShadow = true
         this.sunLight.shadow.camera.far = 15
         this.sunLight.shadow.mapSize.set(1024, 1024)
@@ -39,21 +39,21 @@ export default class Environment
                 .min(0)
                 .max(10)
                 .step(0.001)
-            
+
             this.debugFolder
                 .add(this.sunLight.position, 'x')
                 .name('sunLightX')
                 .min(- 5)
                 .max(5)
                 .step(0.001)
-            
+
             this.debugFolder
                 .add(this.sunLight.position, 'y')
                 .name('sunLightY')
                 .min(- 5)
                 .max(5)
                 .step(0.001)
-            
+
             this.debugFolder
                 .add(this.sunLight.position, 'z')
                 .name('sunLightZ')
@@ -66,10 +66,10 @@ export default class Environment
     setEnvironmentMap()
     {
         this.environmentMap = {}
-        this.environmentMap.intensity = 0.4
+        this.environmentMap.intensity = 1
         this.environmentMap.texture = this.resources.items.environmentMapTexture
         this.environmentMap.texture.colorSpace = THREE.SRGBColorSpace
-        
+
         this.scene.environment = this.environmentMap.texture
 
         this.environmentMap.updateMaterials = () =>
