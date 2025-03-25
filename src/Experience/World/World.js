@@ -2,15 +2,26 @@ import Experience from '../Experience.js';
 import Environment from './Environment.js';
 import Farm from './Farm.js';
 import PlacementMap from "./PlacementMap.js";
+import CornsField from "./Fields/CornsField.js";
+import GrapesField from "./Fields/GrapesField.js";
+import StrawberriesField from "./Fields/StrawberriesField.js";
+import TomatoesField from "./Fields/TomatoesField.js";
+import Actions from "./Actions.js";
 
 export default class World {
     constructor() {
         this.experience = new Experience();
+        this.canvas = this.experience.canvas;
         this.scene = this.experience.scene;
         this.resources = this.experience.resources;
         this.time = this.experience.time;
+        this.actions = new Actions();
 
         this.farmAssets = [];
+        this.toAddAssetName = null;
+        this.worldMoney = 0;
+
+        this.mouseClick = this.mouseClick.bind(this);
 
         this.resources.on('ready', () => {
             //Farm
@@ -21,7 +32,65 @@ export default class World {
             this.scene.add(this.placementMap);
 
             this.environment = new Environment();
+
+            this.canvas.addEventListener("click", this.mouseClick);
         });
+    }
+
+    mouseClick(event) {
+        event.stopPropagation();
+
+        if (this.placementMap.isPlaceMentMapActive) {
+            const selectedMark = this.placementMap.selectedMark;
+
+            if (selectedMark && this.toAddAssetName) {
+                const placementMarkPosition = selectedMark.position;
+
+                const AssetClasses = {
+                    CORN: CornsField,
+                    GRAPE: GrapesField,
+                    STRAWBERRY: StrawberriesField,
+                    TOMATO: TomatoesField,
+                };
+
+                const AssetClass = AssetClasses[this.toAddAssetName];
+
+                if (AssetClass) {
+                    const asset = new AssetClass();
+                    asset.grow();
+                    asset.position.copy(placementMarkPosition);
+                    this.farmAssets.push(asset);
+                    this.scene.add(asset);
+                }
+
+                this.placementMap.removeMark(selectedMark);
+                this.placementMap.deactivateMark();
+                this.toAddAssetName = null;
+                return;
+            }
+
+            this.placementMap.deactivateMark();
+            this.toAddAssetName = null;
+            return;
+        }
+
+        const assetsBoundingBoxes = this.farmAssets.filter(asset => asset.getBoundingBox());
+
+        const result = this.actions.raycastDetection(event, assetsBoundingBoxes);
+        if (!result) return;
+
+        const asset = result.object.parent;
+        asset.harvest();
+        this.worldMoney += 100;
+    }
+
+    addFarmAsset(assetName) {
+        this.placementMap.activateMarks();
+        this.toAddAssetName = assetName;
+    }
+
+    destroy() {
+        window.removeEventListener('mousemove', this.mouseClick);
     }
 
     update() {
@@ -37,22 +106,6 @@ export default class World {
 
 /*
     FARM ASSETS
-
-    const cornsField = new CornsField();
-    this.farmAssets.push(cornsField);
-    //this.scene.add(cornsField);
-
-    const grapesField = new GrapesField();
-    this.farmAssets.push(grapesField);
-    //this.scene.add(grapesField);
-
-    const tomatoesField = new TomatoesField();
-    this.farmAssets.push(tomatoesField);
-    //this.scene.add(tomatoesField);
-
-    const strawberriesField = new StrawberriesField();
-    this.farmAssets.push(strawberriesField);
-    //this.scene.add(strawberriesField);
 
     const cowsFence = new CowsFence();
     this.farmAssets.push(cowsFence);

@@ -2,12 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Code structuring</title>
-    <link rel="stylesheet" href="./style.css">
+    <link href="./style.css" rel="stylesheet">
 </head>
 <body>
-    <canvas class="webgl"></canvas>
-    <script type="module" src="./script.js"></script>
+<canvas class="webgl"></canvas>
+
+<div class="controls">
+    <div>
+        <img alt="Corn" id="corn-button" src="/images/corn.png">
+        <img alt="Grape Image" id="grape-button" src="/images/grape.png">
+        <img alt="Strawberry Image" id="strawberry-button" src="/images/strawberry.png">
+        <img alt="Tomato Image" id="tomato-button" src="/images/tomato.png">
+        <img alt="Cow Image" id="cow-button" src="/images/cow.png">
+        <img alt="Sheep Image" id="sheep-button" src="/images/sheep.png">
+    </div>
+</div>
+
+<script src="./script.js" type="module"></script>
 </body>
 </html>

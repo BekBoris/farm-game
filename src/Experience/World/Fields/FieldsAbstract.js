@@ -54,8 +54,10 @@ export default class FieldsAbstract extends Group {
         const size = this.getSize();
         const center = this.getCenter();
         const geometry = new BoxGeometry(size.x, size.y, size.z);
-        const material = new MeshBasicMaterial({visible: true, wireframe: true});
-        this.boundingMesh = new Mesh(geometry, material);
+        const material = new MeshBasicMaterial({visible: false, wireframe: true});
+        const mesh = new Mesh(geometry, material);
+        mesh.layers.set(1);
+        this.boundingMesh = mesh;
         this.boundingMesh.position.copy(center);
         this.add(this.boundingMesh);
     }

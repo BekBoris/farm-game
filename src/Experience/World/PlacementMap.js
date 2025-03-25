@@ -1,23 +1,30 @@
-import {Box3, Group, Vector3} from "three";
+import {Box3, BoxGeometry, Group, Mesh, MeshBasicMaterial, Vector3} from "three";
 import Experience from "../Experience.js";
 import {copyModel} from "./Utils.js";
-import {WebGLRenderList as placementMarks} from "three/src/renderers/webgl/WebGLRenderLists.js";
+import Actions from "./Actions.js";
 
 export default class PlacementMap extends Group {
-    activate;
 
     constructor() {
         super();
 
         this.experience = new Experience();
+        this.canvas = this.experience.canvas;
         this.resources = this.experience.resources;
         this.placementMarkResource = this.resources.items.placementMarkModel;
+        this.actions = new Actions();
 
-        this.position.set(0, 0, -3.7);
+        //this.position.set(0, 0, -3.7);
 
         this.placementMarks = [];
+        this.placementMarksPlanes = [];
         this.placementMarkSize = null;
+        this.selectedMark = null;
 
+        this.isPlaceMentMapActive = false;
+
+        this.mouseMove = this.mouseMove.bind(this);
+        this.canvas.addEventListener("mousemove", this.mouseMove);
 
         this.create();
     }
@@ -47,35 +54,72 @@ export default class PlacementMap extends Group {
             new Vector3(9, 0, 13)
         ];
 
+        positions.forEach(pos => pos.z -= 3.7);
+
         positions.forEach((position, index) => {
 
             const placementMark = copyModel(this.placementMarkResource.scene);
             placementMark.position.copy(position);
             placementMark.rotation.y = -Math.PI / 2;
-            placementMark.scale.setScalar(0.8);
+            placementMark.updateMatrixWorld(true);
             placementMark.visible = false;
 
             placementMark.name = index;
 
             if (!this.placementMarkSize) {
-                const box = new Box3().setFromObject(placementMark, true);
+                const box = new Box3().setFromObject(placementMark);
                 this.placementMarkSize = box.getSize(new Vector3());
             }
 
+            const placementMarkSize = this.placementMarkSize;
+            const planeGeometry = new BoxGeometry(placementMarkSize.z, 0.5, placementMarkSize.x);
+            const planeMaterial = new MeshBasicMaterial({visible: false, wireframe: true});
+            const placementMarkPlane = new Mesh(planeGeometry, planeMaterial);
+            placementMarkPlane.layers.set(1);
+            placementMark.add(placementMarkPlane);
+
+            placementMark.scale.setScalar(0.8);
+
             this.placementMarks.push(placementMark);
+            this.placementMarksPlanes.push(placementMarkPlane);
             this.add(placementMark);
         });
     }
 
+    mouseMove(event) {
+        event.stopPropagation();
+        const result = this.actions.raycastDetection(event, [...this.placementMarksPlanes]);
+        if (!result) {
+            if (this.selectedMark) this.setPlacementMarkColor(this.selectedMark, '#ffffff');
+            this.selectedMark = null;
+            return;
+        }
+
+        if (this.selectedMark && this.selectedMark.uuid === result.object.parent.uuid) {
+            return;
+        }
+
+        if (this.selectedMark && this.selectedMark.uuid !== result.object.parent.uuid) {
+            this.setPlacementMarkColor(this.selectedMark, '#ffffff');
+        }
+
+        this.selectedMark = result.object.parent;
+        this.setPlacementMarkColor(this.selectedMark, '#ff0000');
+    }
+
     activateMarks() {
         this.placementMarks.forEach((placementMark) => placementMark.visible = true);
+        this.isPlaceMentMapActive = true;
     }
 
-    deactivateMarks() {
+    deactivateMark() {
         this.placementMarks.forEach((placementMark) => placementMark.visible = false);
+        this.isPlaceMentMapActive = false;
     }
 
-    removeMark(index) {
+    removeMark(placementMark) {
+        const index = this.placementMarks.indexOf(placementMark);
+        if (index === -1) return;
         const mark = this.placementMarks[index];
         this.remove(mark);
         this.destroyMark(mark);
@@ -94,8 +138,11 @@ export default class PlacementMap extends Group {
         });
     }
 
-
-    getPlacementMarks() {
-        return this.placementMarks;
+    setPlacementMarkColor(placementMark, color) {
+        placementMark.traverse((child) => {
+            if (child.isMesh && child.material && child.material.color) {
+                child.material.color.set(color);
+            }
+        });
     }
 }
