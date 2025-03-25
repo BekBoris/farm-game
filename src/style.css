@@ -15,7 +15,7 @@ body {
     outline: none;
 }
 
-.controls {
+.game-controls {
     width: fit-content;
     height: fit-content;
     position: fixed;
@@ -27,11 +27,60 @@ body {
     gap: 1rem;
 }
 
-.controls img {
+.game-controls img {
     width: 3rem;
-    height: auto;
+    height: 3rem;
     border: 2px solid black;
     border-radius: 3px;
     padding: 0.5rem;
     cursor: pointer;
+}
+
+.sound-controls {
+    width: fit-content;
+    height: fit-content;
+    position: fixed;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.sound-controls img {
+    width: 5rem;
+    height: 5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.gray {
+    filter: grayscale(1);
+}
+
+.money-panel {
+    width: fit-content;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.money-panel img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 3px;
+    padding: 0.5rem;
+}
+
+.money-panel #money {
+    color: white;
+    font-weight: bold;
+    font-family: "Al Bayan", cursive;
+    font-size: 3rem;
+    line-height: 1;
 }

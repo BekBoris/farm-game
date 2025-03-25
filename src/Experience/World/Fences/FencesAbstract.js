@@ -1,20 +1,13 @@
-import {Box3, BoxGeometry, Group, Mesh, MeshBasicMaterial, Vector3} from "three";
-import Experience from "../../Experience.js";
+import {BoxGeometry, Group, Mesh, MeshBasicMaterial, Vector3} from "three";
 import {copyModel} from "../Utils.js";
 
-export default class FieldsAbstract extends Group {
+export default class FencesAbstract extends Group {
     constructor() {
         super();
-        this.experience = new Experience();
-        this.resources = this.experience.resources;
-        this.coinResource = this.resources.items.coinModel;
-        this.boundingMesh = null;
-        this.isReadyToCollect = false;
     }
 
     addCoin() {
         this.coin = copyModel(this.coinResource.scene);
-        this.coin.visible = false;
         this.coin.rotation.z = Math.PI / 2;
         this.coin.scale.setScalar(2.5);
 
@@ -27,27 +20,38 @@ export default class FieldsAbstract extends Group {
     }
 
     grow() {
-
-        this.crops.forEach(crop => crop.setGrowStep(1));
-
+        this.resetSteps();
         setTimeout(() => {
-            this.crops.forEach(crop => crop.setGrowStep(2));
-        }, 2000);
-
-        setTimeout(() => {
-            this.crops.forEach(crop => crop.setGrowStep(3));
             this.isReadyToCollect = true;
             this.coin.visible = true;
-        }, 4000);
+        }, 6000);
     }
 
     harvest() {
         if (this.isReadyToCollect) {
-            this.isReadyToCollect = false;
-            this.coin.visible = false;
-            this.crops.forEach(crop => crop.resetSteps());
+            this.resetSteps();
             this.grow();
         }
+    }
+
+    resetSteps() {
+        this.isReadyToCollect = false;
+        this.coin.visible = false;
+    }
+
+    setBrightness(factor) {
+        this.traverse((child) => {
+            if (child instanceof Mesh) {
+                child.material.color.multiplyScalar(factor);
+            }
+        });
+    }
+
+    setOnGround(vector3) {
+        this.grow();
+        if (vector3.x > 0) this.rotation.y = -Math.PI / 2;
+        if (vector3.x < 0) this.rotation.y = Math.PI / 2;
+        this.setPosition(vector3);
     }
 
     setBoundingMesh() {
@@ -55,7 +59,7 @@ export default class FieldsAbstract extends Group {
 
         const height = 1;
         const geometry = new BoxGeometry(size.x, height, size.z);
-        geometry.translate(0, height, 0);
+        geometry.translate(0, height / 2, 0);
 
         const material = new MeshBasicMaterial({visible: false, wireframe: true});
 
@@ -66,18 +70,8 @@ export default class FieldsAbstract extends Group {
         this.add(this.boundingMesh);
     }
 
-    setOnGround(vector3) {
-        this.grow();
-        this.setPosition(vector3);
-    }
-
-    getBoundingMesh() {
-        return this.boundingMesh;
-    }
-
-    getBoundingBox() {
-        this.updateWorldMatrix(true, true);
-        return new Box3().setFromObject(this, false);
+    setPosition(vector3) {
+        this.position.copy(vector3);
     }
 
     getSize() {
@@ -88,17 +82,19 @@ export default class FieldsAbstract extends Group {
         return this.getBoundingBox().getCenter(new Vector3());
     }
 
-    setPosition(vector3) {
-        this.position.copy(vector3);
+    getBoundingMesh() {
+        return this.boundingMesh;
     }
 
-    setScale(scale) {
-        this.scale.copy(scale);
-    }
-
-    update() {
+    update(delta) {
         if (this.coin && this.coin.visible) {
             this.coin.rotation.y += 0.01;
         }
+
+        Object.values(this.animations).forEach((animSet) => {
+            if (animSet.mixer) {
+                animSet.mixer.update(delta * 0.75);
+            }
+        });
     }
 }

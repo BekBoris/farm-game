@@ -9,7 +9,6 @@ export default class Corns extends CropsAbstract {
         this.resources = this.experience.resources;
         this.cropResource = this.resources.items.cornsFieldModel;
 
-
         this.create();
         this.setBrightness(1.01);
         this.setStepsModels();

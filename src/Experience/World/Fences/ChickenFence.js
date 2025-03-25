@@ -1,8 +1,9 @@
 import Experience from '../../Experience.js';
-import {AnimationMixer, Box3, BoxGeometry, Euler, Group, LoopOnce, Mesh, MeshBasicMaterial, Vector3} from "three";
+import {AnimationMixer, Box3, Euler, LoopOnce, Vector3} from "three";
 import {copyModel, copySkinningModel} from "../Utils.js";
+import FencesAbstract from "./FencesAbstract.js";
 
-export default class ChickensFence extends Group {
+export default class ChickenFence extends FencesAbstract {
     constructor() {
         super();
 
@@ -41,9 +42,6 @@ export default class ChickensFence extends Group {
         this.chickens.forEach((_, index) => {
             this.cycleRandomAnimation(index);
         });
-
-        window.grow = this.setStepsAnimation.bind(this);
-        window.harvest = this.harvest.bind(this);
     }
 
     create() {
@@ -61,18 +59,6 @@ export default class ChickensFence extends Group {
             this.chickens.push(chickenMesh);
             this.add(chickenMesh);
         }
-    }
-
-    addCoin() {
-        this.coin = copyModel(this.coinResource.scene);
-        this.coin.rotation.z = Math.PI / 2;
-        this.coin.scale.setScalar(2.5);
-
-        this.add(this.coin);
-
-        const size = this.getChickensFenceSize();
-        const center = this.getChickensFenceCenter();
-        this.coin.position.y = center.y + size.y / 2 + 0.5;
     }
 
     setAnimations() {
@@ -137,43 +123,7 @@ export default class ChickensFence extends Group {
         });
     }
 
-    resetSteps() {
-        this.isReadyToCollect = false;
-        if (this.coin) {
-            this.coin.visible = false;
-        }
-    }
-
-    harvest() {
-        if (this.isReadyToCollect) {
-            this.resetSteps();
-            this.setStepsAnimation();
-        }
-    }
-
-    setStepsAnimation() {
-        this.resetSteps();
-
-        setTimeout(() => {
-            this.isReadyToCollect = true;
-            if (this.coin) {
-                this.coin.visible = true;
-            }
-        }, 6000);
-    }
-
-    setBoundingMesh() {
-        const size = this.getChickensFenceSize();
-        const center = this.getChickensFenceCenter();
-
-        const geometry = new BoxGeometry(size.x, size.y, size.z);
-        const material = new MeshBasicMaterial({visible: true, wireframe: true});
-        this.boundingMesh = new Mesh(geometry, material);
-        this.boundingMesh.position.copy(center);
-        this.add(this.boundingMesh);
-    }
-
-    getChickensFenceBoundingBox() {
+    getBoundingBox() {
         const box = new Box3();
         box.union(new Box3().setFromObject(this.chickensFenceModel, false));
         this.chickens.forEach((chick) => {
@@ -181,25 +131,5 @@ export default class ChickensFence extends Group {
             box.union(chickBox);
         });
         return box;
-    }
-
-    getChickensFenceSize() {
-        return this.getChickensFenceBoundingBox().getSize(new Vector3());
-    }
-
-    getChickensFenceCenter() {
-        return this.getChickensFenceBoundingBox().getCenter(new Vector3());
-    }
-
-    update(delta) {
-        if (this.coin && this.coin.visible) {
-            this.coin.rotation.y += 0.01;
-        }
-
-        this.animations.forEach((animSet) => {
-            if (animSet.mixer) {
-                animSet.mixer.update(delta);
-            }
-        });
     }
 }

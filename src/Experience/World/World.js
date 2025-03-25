@@ -7,9 +7,15 @@ import GrapesField from "./Fields/GrapesField.js";
 import StrawberriesField from "./Fields/StrawberriesField.js";
 import TomatoesField from "./Fields/TomatoesField.js";
 import Actions from "./Actions.js";
+import CowsFence from "./Fences/CowsFence.js";
+import SheepFence from "./Fences/SheepFence.js";
+import Sounds from "./Sounds.js";
+import EventEmitter from "../Utils/EventEmitter.js";
+import ChickenFence from "./Fences/ChickenFence.js";
 
-export default class World {
+export default class World extends EventEmitter {
     constructor() {
+        super();
         this.experience = new Experience();
         this.canvas = this.experience.canvas;
         this.scene = this.experience.scene;
@@ -33,6 +39,8 @@ export default class World {
 
             this.environment = new Environment();
 
+            this.sounds = new Sounds();
+
             this.canvas.addEventListener("click", this.mouseClick);
         });
     }
@@ -51,20 +59,23 @@ export default class World {
                     GRAPE: GrapesField,
                     STRAWBERRY: StrawberriesField,
                     TOMATO: TomatoesField,
+                    COW: CowsFence,
+                    SHEEP: SheepFence,
+                    CHICKEN: ChickenFence,
                 };
 
                 const AssetClass = AssetClasses[this.toAddAssetName];
 
                 if (AssetClass) {
                     const asset = new AssetClass();
-                    asset.grow();
-                    asset.position.copy(placementMarkPosition);
+                    asset.setOnGround(placementMarkPosition);
                     this.farmAssets.push(asset);
                     this.scene.add(asset);
                 }
 
                 this.placementMap.removeMark(selectedMark);
                 this.placementMap.deactivateMark();
+                this.sounds.playSound('drop');
                 this.toAddAssetName = null;
                 return;
             }
@@ -74,14 +85,41 @@ export default class World {
             return;
         }
 
-        const assetsBoundingBoxes = this.farmAssets.filter(asset => asset.getBoundingBox());
+        const assetsBoundingMeshes = this.farmAssets.filter(asset => asset.getBoundingMesh());
 
-        const result = this.actions.raycastDetection(event, assetsBoundingBoxes);
-        if (!result) return;
+        const result = this.actions.raycastDetection(event, assetsBoundingMeshes);
+        if (!result) {
+            this.sounds.playSound('click');
+            return;
+        }
+
 
         const asset = result.object.parent;
-        asset.harvest();
-        this.worldMoney += 100;
+
+        if (asset.isReadyToCollect) {
+            asset.harvest();
+            this.sounds.playSound('harvest');
+            this.worldMoney += 100;
+            const worldMoney = this.worldMoney;
+            this.trigger('collect', [worldMoney]);
+            return;
+        }
+
+        if (asset instanceof SheepFence) {
+            this.sounds.playSound('sheep', true);
+            return;
+        }
+
+        if (asset instanceof CowsFence) {
+            this.sounds.playSound('cow', true);
+            return;
+        }
+
+        if (asset instanceof ChickenFence) {
+            this.sounds.playSound('chicken', true);
+        }
+
+
     }
 
     addFarmAsset(assetName) {
@@ -91,6 +129,14 @@ export default class World {
 
     destroy() {
         window.removeEventListener('mousemove', this.mouseClick);
+    }
+
+    muteMusic(status) {
+        if (status) {
+            this.sounds.stopMusic();
+            return;
+        }
+        this.sounds.playMusic();
     }
 
     update() {
@@ -104,18 +150,3 @@ export default class World {
     }
 }
 
-/*
-    FARM ASSETS
-
-    const cowsFence = new CowsFence();
-    this.farmAssets.push(cowsFence);
-    //this.scene.add(cowsFence);
-
-    const sheepFence = new SheepFence();
-    this.farmAssets.push(sheepFence);
-    //this.scene.add(sheepFence);
-
-    const chickensFence = new ChickensFence();
-    this.farmAssets.push(chickensFence);
-    //this.scene.add(chickensFence);
-*/
