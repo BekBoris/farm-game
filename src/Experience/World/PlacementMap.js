@@ -14,8 +14,6 @@ export default class PlacementMap extends Group {
         this.placementMarkResource = this.resources.items.placementMarkModel;
         this.actions = new Actions();
 
-        //this.position.set(0, 0, -3.7);
-
         this.placementMarks = [];
         this.placementMarksPlanes = [];
         this.placementMarkSize = null;
@@ -30,31 +28,18 @@ export default class PlacementMap extends Group {
     }
 
     create() {
-        /*const verticalGap = 6.5;
+        const verticalGap = 9;
         const horizontalOffset = 9;
 
         const positions = [];
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 3; i++) {
             positions.push(new Vector3(-horizontalOffset, 0, i * verticalGap - verticalGap));
         }
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 3; i++) {
             positions.push(new Vector3(horizontalOffset, 0, i * verticalGap - verticalGap));
-        }*/
-
-        const positions = [
-            new Vector3(-11, 0, -6.5),
-            new Vector3(-11, 0, 0),
-            new Vector3(-11, 0, 6.5),
-            new Vector3(-11, 0, 13),
-            new Vector3(9, 0, -6.5),
-            new Vector3(9, 0, 0),
-            new Vector3(9, 0, 6.5),
-            new Vector3(9, 0, 13)
-        ];
-
-        positions.forEach(pos => pos.z -= 3.7);
+        }
 
         positions.forEach((position, index) => {
 

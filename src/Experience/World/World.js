@@ -30,7 +30,7 @@ export default class World extends EventEmitter {
         this.mouseClick = this.mouseClick.bind(this);
 
         this.resources.on('ready', () => {
-            //Farm
+
             this.farm = new Farm();
             this.scene.add(this.farm);
 

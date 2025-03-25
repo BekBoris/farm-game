@@ -22,7 +22,6 @@ export default class Sounds {
         this.loader = new AudioLoader();
         this.sounds = {};
 
-        // One music track
         this.music = null;
         this.musicLoaded = false;
 
@@ -68,10 +67,7 @@ export default class Sounds {
 
     initMusic() {
         const onUserGesture = () => {
-            // Attempt to play music on the first user gesture
             this.playMusic();
-
-            // Remove these listeners so it only fires once
             window.removeEventListener('mousemove', onUserGesture);
             window.removeEventListener('click', onUserGesture);
         };
