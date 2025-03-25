@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import {Group} from 'three';
 import Experience from '../Experience.js';
 
-export default class Farm {
+export default class Farm extends Group {
 
     constructor() {
+        super();
         this.experience = new Experience();
-        this.scene = this.experience.scene;
         this.resources = this.experience.resources;
 
         this.resource = this.resources.items.farmModel;
@@ -19,7 +20,7 @@ export default class Farm {
     create() {
         this.model = this.resource.scene;
         this.model.position.y = -4.6;
-        this.scene.add(this.model);
+        this.add(this.model);
     }
 
     brightUp(factor) {

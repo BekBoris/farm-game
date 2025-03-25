@@ -1,35 +1,32 @@
-import Experience from '../../Experience.js';
 import FieldsAbstract from "./FieldsAbstract.js";
+import {Vector3} from "three";
+import Strawberries from "../Crops/Strawberries.js";
 
-export default class StrawberriesField extends FieldsAbstract {
-
+export default class CornsField extends FieldsAbstract {
     constructor() {
         super();
-        this.experience = new Experience();
-        this.scene = this.experience.scene;
-        this.resources = this.experience.resources;
-        this.fieldResource = this.resources.items.strawberriesFieldModel;
-        this.coinResource = this.resources.items.coinModel;
+        this.crops = [];
 
         this.create();
         this.addCoin();
         this.setBoundingMesh();
-        this.setBrightness(1.01);
-        this.setStepsModel();
-        this.resetSteps();
     }
 
-    setStepsModel() {
-        this.model.traverse((child) => {
-            if (child.name === 'strawberry_1') {
-                this.step1Model = child;
-            }
-            if (child.name === 'strawberry_2') {
-                this.step2Model = child;
-            }
-            if (child.name === 'strawberry_3') {
-                this.step3Model = child;
-            }
+    create() {
+        const positions = [
+            new Vector3(-3.3, 0, -1.8),
+            new Vector3(-3.3, 0, 1.8),
+            new Vector3(0, 0, -1.8),
+            new Vector3(0, 0, 1.8),
+            new Vector3(3.3, 0, -1.8),
+            new Vector3(3.3, 0, 1.8),
+        ];
+
+        positions.forEach((position) => {
+            const crop = new Strawberries();
+            crop.setPosition(position);
+            this.crops.push(crop);
+            this.add(crop);
         });
     }
 }
