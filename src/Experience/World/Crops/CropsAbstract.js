@@ -11,7 +11,7 @@ export default class CropsAbstract extends Group {
     }
 
     create() {
-        this.model = copyModel(this.fieldResource.scene);
+        this.model = copyModel(this.cropResource.scene);
         this.add(this.model);
     }
 

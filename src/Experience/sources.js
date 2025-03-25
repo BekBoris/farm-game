@@ -71,5 +71,11 @@ export default [
         name: 'chickenModel',
         type: 'gltfModel',
         path: 'models/FarmAssets/Cattle/chicken.glb'
+    },
+
+    {
+        name: 'placementMarkModel',
+        type: 'gltfModel',
+        path: 'models/FarmAssets/placement-mark.glb'
     }
 ];

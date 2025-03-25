@@ -7,7 +7,7 @@ export default class Corns extends CropsAbstract {
         super();
         this.experience = new Experience();
         this.resources = this.experience.resources;
-        this.fieldResource = this.resources.items.cornsFieldModel;
+        this.cropResource = this.resources.items.cornsFieldModel;
 
 
         this.create();

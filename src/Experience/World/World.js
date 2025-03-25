@@ -1,6 +1,7 @@
 import Experience from '../Experience.js';
 import Environment from './Environment.js';
 import Farm from './Farm.js';
+import PlacementMap from "./PlacementMap.js";
 
 export default class World {
     constructor() {
@@ -15,6 +16,10 @@ export default class World {
             //Farm
             this.farm = new Farm();
             this.scene.add(this.farm);
+
+            this.placementMap = new PlacementMap();
+            this.scene.add(this.placementMap);
+
             this.environment = new Environment();
         });
     }

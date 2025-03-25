@@ -7,7 +7,7 @@ export default class Grapes extends CropsAbstract {
         super();
         this.experience = new Experience();
         this.resources = this.experience.resources;
-        this.fieldResource = this.resources.items.grapesFieldModel;
+        this.cropResource = this.resources.items.grapesFieldModel;
 
         this.create();
         this.setBrightness(1.01);

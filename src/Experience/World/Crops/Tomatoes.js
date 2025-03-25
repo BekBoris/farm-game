@@ -7,7 +7,7 @@ export default class Tomatoes extends CropsAbstract {
         super();
         this.experience = new Experience();
         this.resources = this.experience.resources;
-        this.fieldResource = this.resources.items.tomatoesFieldModel;
+        this.cropResource = this.resources.items.tomatoesFieldModel;
 
         this.create();
         this.setBrightness(1.01);

@@ -7,7 +7,7 @@ export default class Strawberries extends CropsAbstract {
         super();
         this.experience = new Experience();
         this.resources = this.experience.resources;
-        this.fieldResource = this.resources.items.strawberriesFieldModel;
+        this.cropResource = this.resources.items.strawberriesFieldModel;
 
         this.create();
         this.setBrightness(1.01);
