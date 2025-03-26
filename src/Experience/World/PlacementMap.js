@@ -109,6 +109,7 @@ export default class PlacementMap extends Group {
         this.remove(mark);
         this.destroyMark(mark);
         this.placementMarks.splice(index, 1);
+        this.placementMarksPlanes.splice(index, 1);
     }
 
     destroyMark(mark) {
